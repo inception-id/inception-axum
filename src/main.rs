@@ -1,6 +1,7 @@
 mod ai_system_prompt;
 mod checkbot;
 mod db;
+mod exchange;
 mod language_ai;
 mod languageai_subscriptions;
 mod languages;
@@ -57,6 +58,7 @@ async fn main() {
             "/languageai/subscriptions",
             languageai_subscriptions::languageai_subscription_routes(),
         )
+        .nest("/exchange", exchange::exchange_routes())
         .with_state(pool)
         .layer(from_fn(middleware::session_middleware))
         .layer(from_fn(middleware::api_key_middleware))

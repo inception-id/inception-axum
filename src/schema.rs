@@ -53,6 +53,19 @@ diesel::table! {
 }
 
 diesel::table! {
+    exchange_developers (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        #[max_length = 255]
+        api_key -> Varchar,
+        api_cost -> Float8,
+        balance -> Float8,
+    }
+}
+
+diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::SubscriptionPeriod;
     use super::sql_types::PaymentStatus;
@@ -222,6 +235,7 @@ diesel::table! {
 diesel::joinable!(checkbot -> users (user_id));
 diesel::joinable!(checkbot_storage -> checkbot (checkbot_id));
 diesel::joinable!(checkbot_storage -> users (user_id));
+diesel::joinable!(exchange_developers -> users (user_id));
 diesel::joinable!(languageai_subscription_payments -> languageai_subscription_plans (languageai_subscription_plan_id));
 diesel::joinable!(languageai_subscription_payments -> users (user_id));
 diesel::joinable!(languageai_subscriptions -> languageai_subscription_payments (languageai_subscription_payment_id));
@@ -241,6 +255,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     ai_system_prompts,
     checkbot,
     checkbot_storage,
+    exchange_developers,
     languageai_subscription_payments,
     languageai_subscription_plans,
     languageai_subscriptions,
