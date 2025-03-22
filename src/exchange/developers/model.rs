@@ -7,13 +7,13 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Queryable, Serialize)]
 pub(super) struct ExchangeDeveloper {
-    id: uuid::Uuid,
-    user_id: uuid::Uuid,
-    created_at: chrono::NaiveDateTime,
-    updated_at: chrono::NaiveDateTime,
+    pub id: uuid::Uuid,
+    pub user_id: uuid::Uuid,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
     pub api_key: String,
-    api_cost: f64,
-    balance: f64,
+    pub api_cost: f64,
+    pub balance: f64,
 }
 
 impl ExchangeDeveloper {
@@ -48,6 +48,19 @@ impl ExchangeDeveloper {
 
         diesel::insert_into(exchange_developers::table)
             .values(&values)
+            .get_result(conn)
+    }
+
+    pub(super) fn update_api_key(
+        pool: &DbPool,
+        user_id: &uuid::Uuid,
+        new_api_key: &str,
+    ) -> QueryResult<Self> {
+        let conn = &mut pool.get().expect("Couldn't get db connection from pool");
+
+        diesel::update(exchange_developers::table)
+            .filter(exchange_developers::user_id.eq(user_id))
+            .set(exchange_developers::api_key.eq(new_api_key))
             .get_result(conn)
     }
 
