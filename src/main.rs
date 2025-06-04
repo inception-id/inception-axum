@@ -1,20 +1,8 @@
-mod ai_system_prompt;
-mod checkbot;
 mod db;
-mod exchange;
-mod language_ai;
-mod languageai_subscriptions;
-mod languages;
-mod middleware;
 mod schema;
-mod speech_to_text;
-mod text_to_speech;
-mod translation;
-mod users;
-mod utils;
 
 use crate::db::build_db_pool;
-use axum::{middleware::from_fn, Router};
+use axum::Router;
 use sentry_tower::{NewSentryLayer, SentryHttpLayer};
 use std::env;
 use tower_http::cors::CorsLayer;
@@ -44,24 +32,7 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .nest("/users", users::user_routes())
-        .nest(
-            "/ai-system-prompts",
-            ai_system_prompt::ai_system_prompt_routes(),
-        )
-        .nest("/languages", languages::language_routes())
-        .nest("/translation", translation::translation_routes())
-        .nest("/checkbot", checkbot::checkbot_routes())
-        .nest("/tts", text_to_speech::tts_routes())
-        .nest("/transcription", speech_to_text::transcription_routes())
-        .nest(
-            "/languageai/subscriptions",
-            languageai_subscriptions::languageai_subscription_routes(),
-        )
-        .nest("/exchange", exchange::exchange_routes())
         .with_state(pool)
-        .layer(from_fn(middleware::session_middleware))
-        .layer(from_fn(middleware::api_key_middleware))
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .layer(NewSentryLayer::new_from_top())
