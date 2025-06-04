@@ -36,12 +36,14 @@ async fn main() {
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .layer(NewSentryLayer::new_from_top())
-        .layer(SentryHttpLayer::with_transaction());
+        .layer(SentryHttpLayer::new().enable_transaction());
 
     // run our app with hyper, listening globally on env port
     let host_addr = env::var("HOST_ADDRESS").expect("Missing HOST_ADDRESS");
     let listener = tokio::net::TcpListener::bind(&host_addr).await.unwrap();
 
     println!("Server started at {}", host_addr);
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .await
+        .expect("Server failed to start");
 }
