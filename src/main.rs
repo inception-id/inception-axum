@@ -1,5 +1,7 @@
 mod db;
+mod middleware;
 mod schema;
+mod users;
 
 use crate::db::build_db_pool;
 use axum::Router;
