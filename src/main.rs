@@ -1,9 +1,11 @@
 mod db;
 mod middleware;
 mod schema;
+mod supertokens;
 mod users;
 
 use crate::db::build_db_pool;
+use crate::users::user_routes;
 use axum::Router;
 use sentry_tower::{NewSentryLayer, SentryHttpLayer};
 use std::env;
@@ -35,6 +37,7 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
+        .nest("/users", user_routes())
         .with_state(pool)
         .layer(cors)
         .layer(TraceLayer::new_for_http())
