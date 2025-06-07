@@ -7,7 +7,8 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT NOW (),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW (),
     email VARCHAR(255) NOT NULL,
-    phone VARCHAR(255)
+    phone VARCHAR(255),
+    is_super_admin BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE companies (
@@ -19,6 +20,7 @@ CREATE TABLE companies (
     email VARCHAR(255),
     phone VARCHAR(255),
     website VARCHAR(255),
+    api_key VARCHAR(255),
     ip_address JSONB NOT NULL DEFAULT '[]'
 );
 

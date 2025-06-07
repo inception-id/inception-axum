@@ -15,7 +15,8 @@ async fn main() {
     let pool = build_db_pool();
     let cors = CorsLayer::permissive();
 
-    let tracing_filter = tracing_subscriber::EnvFilter::new("tower_http::trace::make_span=debug,tower_http::trace::on_response=debug,tower_http::trace::on_request=debug");
+    let tracing_format = "tower_http::trace::make_span=debug,tower_http::trace::on_response=debug,tower_http::trace::on_request=debug";
+    let tracing_filter = tracing_subscriber::EnvFilter::new(tracing_format);
     tracing_subscriber::fmt()
         .with_env_filter(tracing_filter)
         .init();

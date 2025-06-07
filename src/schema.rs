@@ -15,6 +15,8 @@ diesel::table! {
         phone -> Nullable<Varchar>,
         #[max_length = 255]
         website -> Nullable<Varchar>,
+        #[max_length = 255]
+        api_key -> Nullable<Varchar>,
         ip_address -> Jsonb,
     }
 }
@@ -38,6 +40,7 @@ diesel::table! {
         email -> Varchar,
         #[max_length = 255]
         phone -> Nullable<Varchar>,
+        is_super_admin -> Bool,
     }
 }
 
