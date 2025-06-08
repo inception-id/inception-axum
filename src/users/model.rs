@@ -5,11 +5,11 @@ use crate::{db::DbPool, schema, users::RegisterUserPayload};
 
 #[derive(Queryable, Serialize)]
 pub(super) struct User {
-    id: uuid::Uuid,
+    pub id: uuid::Uuid,
     supertokens_user_id: Option<uuid::Uuid>,
     created_at: chrono::NaiveDateTime,
     updated_at: chrono::NaiveDateTime,
-    email: String,
+    pub email: String,
     phone: Option<String>,
     is_super_admin: bool,
 }
@@ -17,7 +17,7 @@ pub(super) struct User {
 impl User {
     pub(super) fn create(
         pool: &DbPool,
-        supertokens_user_id: &Option<uuid::Uuid>,
+        supertokens_user_id: &uuid::Uuid,
         payload: &RegisterUserPayload,
     ) -> QueryResult<User> {
         let conn = &mut pool.get().expect("Couldn't get db connection from pool");

@@ -51,7 +51,7 @@ async fn register(
     };
 
     let supertokens_user_id = match uuid::Uuid::parse_str(&recipe_user_id) {
-        Ok(uuid) => Some(uuid),
+        Ok(uuid) => uuid,
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     };
     let user = match User::create(&pool, &supertokens_user_id, &payload) {
@@ -59,6 +59,12 @@ async fn register(
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     };
     // TODO: Send smtp email
+    let verification_token =
+        match Supertokens::create_email_verification_token(&supertokens_user_id, &user.email).await
+        {
+            Ok(supertokens) => supertokens.token,
+            Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+        };
     JsonResponse::send(200, Some(user), None)
 }
 

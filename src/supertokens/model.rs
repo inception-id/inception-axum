@@ -1,7 +1,10 @@
-use crate::{supertokens::response::SupertokensSignUpResponse, users::RegisterUserPayload};
+use crate::{
+    supertokens::response::{SupertokensEmailVerificationTokenResponse, SupertokensSignUpResponse},
+    users::RegisterUserPayload,
+};
 
 use super::paths::SupertokensPath;
-use std::env;
+use std::{collections::HashMap, env};
 
 pub struct Supertokens {
     connection_uri: String,
@@ -36,6 +39,28 @@ impl Supertokens {
             .post(url)
             .header("Authorization", &supertokens.api_key)
             .json(&json_payload)
+            .send()
+            .await?
+            .json()
+            .await
+    }
+
+    pub async fn create_email_verification_token(
+        user_id: &uuid::Uuid,
+        email: &str,
+    ) -> Result<SupertokensEmailVerificationTokenResponse, reqwest::Error> {
+        let supertokens = Supertokens::new(SupertokensPath::EmailVerificationToken);
+        let url = format!("{}{}", &supertokens.connection_uri, &supertokens.path);
+
+        let mut map = HashMap::new();
+        map.insert("userId", user_id.to_string());
+        map.insert("email", email.to_string());
+        let client = reqwest::Client::new();
+
+        client
+            .post(url)
+            .header("Authorization", &supertokens.api_key)
+            .json(&map)
             .send()
             .await?
             .json()
