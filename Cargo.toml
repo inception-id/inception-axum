@@ -9,6 +9,7 @@ chrono = {version = "0.4.41", features = ["serde"]}
 diesel = { version = "2.2.10", features = ["postgres", "r2d2", "uuid", "chrono", "serde_json"] }
 dotenvy = "0.15.7"
 openssl = {version = "0.10.70", features = ["vendored"]}
+regex = "1.11.1"
 reqwest = {version = "0.12.19", features = ["json"]}
 sentry = "0.38.1"
 sentry-tower = {version = "0.38.1", features = ["http"]}
@@ -18,3 +19,4 @@ tokio = { version = "1.45.0", features = ["full"]}
 tower-http = {version="0.6.6", features = ["cors", "trace"]}
 tracing-subscriber = {version = "0.3.19", features = ["env-filter"]}
 uuid = {version = "1.17.0", features = ["v4", "serde"]}
+validator = { version = "0.20.0", features = ["derive"] }
