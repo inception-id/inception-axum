@@ -1,12 +1,13 @@
 use super::model::User;
 use crate::{
     db::DbPool,
-    middleware::{AxumResponse, JsonResponse, RE_PHONE},
+    middleware::{api_key_middleware, AxumResponse, JsonResponse, RE_PHONE},
     supertokens::Supertokens,
 };
 
 use axum::{
     extract::{Json, State},
+    middleware::from_fn,
     routing::post,
     Router,
 };
@@ -57,9 +58,12 @@ async fn register(
         Ok(res) => res,
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     };
+    // TODO: Send smtp email
     JsonResponse::send(200, Some(user), None)
 }
 
 pub fn user_routes() -> Router<DbPool> {
-    Router::new().route("/", post(register))
+    Router::new()
+        .route("/", post(register))
+        .layer(from_fn(api_key_middleware))
 }
