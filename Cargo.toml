@@ -8,6 +8,7 @@ axum = "0.8.4"
 chrono = {version = "0.4.41", features = ["serde"]}
 diesel = { version = "2.2.10", features = ["postgres", "r2d2", "uuid", "chrono", "serde_json"] }
 dotenvy = "0.15.7"
+lettre = "0.11.17"
 openssl = {version = "0.10.70", features = ["vendored"]}
 regex = "1.11.1"
 reqwest = {version = "0.12.19", features = ["json"]}
