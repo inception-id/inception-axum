@@ -13,9 +13,10 @@ impl Mail {
         content: &str,
     ) -> Result<Message, lettre::error::Error> {
         let smtp_from = env::var("SMTP_FROM").expect("Missing SMTP_FROM");
-        let smtp_from_address =
-            Address::new(&smtp_from, &smtp_from).expect("Missing SMTP_FROM_ADDRESS");
-        let smtp_to_address = Address::new(email, email).expect("Missing SMTP_TO_ADDRESS");
+        let smtp_from_address = smtp_from
+            .parse::<Address>()
+            .expect("Invalid SMTP_FROM_ADDRESS");
+        let smtp_to_address = email.parse::<Address>().expect("Missing SMTP_TO_ADDRESS");
         Message::builder()
             .from(Mailbox::new(Some(smtp_from), smtp_from_address))
             .to(Mailbox::new(None, smtp_to_address))
@@ -25,8 +26,8 @@ impl Mail {
     }
 
     fn build_smtp() -> Result<SmtpTransport, lettre::transport::smtp::Error> {
-        let smtp_username = env::var("SMTP_USERNAME").expect("Missing SMTP_USERNAME");
-        let smtp_password = env::var("SMTP_PASSWORD").expect("Missing SMTP_PASSWORD");
+        let smtp_username = env::var("SMTP_USER").expect("Missing SMTP_USER");
+        let smtp_password = env::var("SMTP_PASS").expect("Missing SMTP_PASS");
         let smtp_host = env::var("SMTP_HOST").expect("Missing SMTP_HOST");
         let smtp_port = env::var("SMTP_PORT")
             .expect("Missing SMTP_PORT")

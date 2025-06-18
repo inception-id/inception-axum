@@ -1,6 +1,7 @@
 use super::model::User;
 use crate::{
     db::DbPool,
+    mail::Mail,
     middleware::{api_key_middleware, AxumResponse, JsonResponse, RE_PHONE},
     supertokens::Supertokens,
 };
@@ -54,18 +55,23 @@ async fn register(
         Ok(uuid) => uuid,
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     };
+
     let user = match User::create(&pool, &supertokens_user_id, &payload) {
         Ok(res) => res,
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     };
-    // TODO: Send smtp email
+
     let verification_token =
         match Supertokens::create_email_verification_token(&supertokens_user_id, &user.email).await
         {
             Ok(supertokens) => supertokens.token,
-            Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+            Err(err) => return JsonResponse::send(200, Some(user), Some(err.to_string())),
         };
-    JsonResponse::send(200, Some(user), None)
+
+    match Mail::send(&user.email, "Test", &verification_token) {
+        Ok(_) => JsonResponse::send(200, Some(user), None),
+        Err(err) => return JsonResponse::send(200, Some(user), Some(err.to_string())),
+    }
 }
 
 pub fn user_routes() -> Router<DbPool> {

@@ -11,7 +11,6 @@ pub(super) struct User {
     updated_at: chrono::NaiveDateTime,
     pub email: String,
     phone: Option<String>,
-    is_super_admin: bool,
 }
 
 impl User {
