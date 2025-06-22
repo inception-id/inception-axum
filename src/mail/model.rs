@@ -40,7 +40,7 @@ impl Mail {
             Err(err) => return Err(err),
         }
     }
-    pub fn send(
+    fn send(
         email: &str,
         subject: &str,
         content: &str,
@@ -62,5 +62,30 @@ impl Mail {
                 return Err(lettre::error::Error::Io(new_error));
             }
         }
+    }
+
+    pub fn send_register_verification_email(
+        email: &str,
+        verification_token: &str,
+    ) -> Result<lettre::transport::smtp::response::Response, lettre::error::Error> {
+        let subject = "Registration Verification";
+        let frontend_url = env::var("FRONTEND_URL").expect("Missing FRONTEND_URL");
+        let content = format!(
+            "
+                <html>
+                    <title>Inception Registration Verification</title>
+                    <body>
+                        <h1>Hello!</h1>
+                        <h3>Please verify your email address by clicking the link below:</h3>
+                        <a href='http://{frontend_url}/auth/login?t={verification_token}'>Verify Email</a>
+
+                        <p>If the link doesn't work, copy and paste the following URL into your browser:</p>
+                        <p>http://{frontend_url}/auth/login?t={verification_token}</p>
+                    </body>
+                </html>
+            "
+        );
+
+        Self::send(&email, &subject, &content)
     }
 }

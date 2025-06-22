@@ -68,7 +68,7 @@ async fn register(
             Err(err) => return JsonResponse::send(200, Some(user), Some(err.to_string())),
         };
 
-    match Mail::send(&user.email, "Test", &verification_token) {
+    match Mail::send_register_verification_email(&user.email, &verification_token) {
         Ok(_) => JsonResponse::send(200, Some(user), None),
         Err(err) => return JsonResponse::send(200, Some(user), Some(err.to_string())),
     }
