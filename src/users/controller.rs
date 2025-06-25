@@ -65,12 +65,12 @@ async fn register(
         match Supertokens::create_email_verification_token(&supertokens_user_id, &user.email).await
         {
             Ok(supertokens) => supertokens.token,
-            Err(err) => return JsonResponse::send(200, Some(user), Some(err.to_string())),
+            Err(err) => return JsonResponse::send(201, Some(user), Some(err.to_string())),
         };
 
     match Mail::send_register_verification_email(&user.email, &verification_token) {
-        Ok(_) => JsonResponse::send(200, Some(user), None),
-        Err(err) => return JsonResponse::send(200, Some(user), Some(err.to_string())),
+        Ok(_) => JsonResponse::send(201, Some(user), None),
+        Err(err) => return JsonResponse::send(201, Some(user), Some(err.to_string())),
     }
 }
 
