@@ -1,4 +1,4 @@
-use diesel::{prelude::Queryable, ExpressionMethods, QueryResult, RunQueryDsl};
+use diesel::{prelude::Queryable, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use serde::Serialize;
 
 use crate::{db::DbPool, schema, users::RegisterUserPayload};
@@ -6,7 +6,7 @@ use crate::{db::DbPool, schema, users::RegisterUserPayload};
 #[derive(Queryable, Serialize)]
 pub(super) struct User {
     pub id: uuid::Uuid,
-    supertokens_user_id: Option<uuid::Uuid>,
+    pub supertokens_user_id: Option<uuid::Uuid>,
     created_at: chrono::NaiveDateTime,
     updated_at: chrono::NaiveDateTime,
     pub email: String,
@@ -27,6 +27,13 @@ impl User {
         );
         diesel::insert_into(schema::users::table)
             .values(values)
+            .get_result(conn)
+    }
+
+    pub(super) fn find_by_email(pool: &DbPool, email: &str) -> QueryResult<User> {
+        let conn = &mut pool.get().expect("Couldn't get db connection from pool");
+        schema::users::table
+            .filter(schema::users::email.eq(email))
             .get_result(conn)
     }
 }

@@ -75,7 +75,7 @@ async fn register(
 
 #[derive(Deserialize)]
 pub struct VerifyUserPayload {
-    pub token: String,
+    token: String,
 }
 
 async fn verify_user(
@@ -93,9 +93,43 @@ async fn verify_user(
     }
 }
 
+#[derive(Deserialize, Validate)]
+pub struct SendUserVerificationPayload {
+    #[validate(email(message = "Invalid Email"))]
+    email: String,
+}
+
+async fn send_user_verification(
+    State(pool): State<DbPool>,
+    Json(payload): Json<SendUserVerificationPayload>,
+) -> AxumResponse<User> {
+    let user = match User::find_by_email(&pool, &payload.email) {
+        Ok(res) => res,
+        Err(err) => return JsonResponse::send(400, None, Some(err.to_string())),
+    };
+
+    let supertokens_user_id = match user.supertokens_user_id {
+        Some(uuid) => uuid,
+        None => return JsonResponse::send(400, None, Some("User doesn't exist".to_string())),
+    };
+
+    let verification_token =
+        match Supertokens::create_email_verification_token(&supertokens_user_id, &user.email).await
+        {
+            Ok(supertokens) => supertokens.token,
+            Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+        };
+
+    match Mail::send_register_verification_email(&user.email, &verification_token) {
+        Ok(_) => JsonResponse::send(200, None, None),
+        Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+    }
+}
+
 pub fn user_routes() -> Router<DbPool> {
     Router::new()
-        .route("/", post(register))
+        .route("/register", post(register))
         .route("/verify", post(verify_user))
+        .route("/verify/send", post(send_user_verification))
         .layer(from_fn(api_key_middleware))
 }
