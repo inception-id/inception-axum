@@ -3,9 +3,8 @@ use crate::{
     db::DbPool,
     mail::Mail,
     middleware::{api_key_middleware, AxumResponse, JsonResponse, RE_PHONE},
-    supertokens::Supertokens,
+    supertokens::{Supertokens, SupertokensEmailVerificationResponse},
 };
-
 use axum::{
     extract::{Json, State},
     middleware::from_fn,
@@ -74,8 +73,29 @@ async fn register(
     }
 }
 
+#[derive(Deserialize)]
+pub struct VerifyUserPayload {
+    pub token: String,
+}
+
+async fn verify_user(
+    Json(payload): Json<VerifyUserPayload>,
+) -> AxumResponse<SupertokensEmailVerificationResponse> {
+    match Supertokens::verify_email(&payload.token).await {
+        Ok(supertokens) => {
+            if supertokens.status == "OK" {
+                JsonResponse::send(200, Some(supertokens), None)
+            } else {
+                JsonResponse::send(400, None, Some(supertokens.status))
+            }
+        }
+        Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
+    }
+}
+
 pub fn user_routes() -> Router<DbPool> {
     Router::new()
         .route("/", post(register))
+        .route("/verify", post(verify_user))
         .layer(from_fn(api_key_middleware))
 }

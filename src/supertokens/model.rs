@@ -1,7 +1,10 @@
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
-    supertokens::response::{SupertokensEmailVerificationTokenResponse, SupertokensSignUpResponse},
+    supertokens::response::{
+        SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
+        SupertokensSignUpResponse,
+    },
     users::RegisterUserPayload,
 };
 
@@ -28,7 +31,10 @@ impl Supertokens {
         }
     }
 
-    async fn request_supertokens<T, U>(path: SupertokensPath, json: &T) -> Result<U, reqwest::Error>
+    async fn post_request_supertokens<T, U>(
+        path: SupertokensPath,
+        json: &T,
+    ) -> Result<U, reqwest::Error>
     where
         T: Serialize,
         U: DeserializeOwned,
@@ -52,7 +58,7 @@ impl Supertokens {
         payload: &RegisterUserPayload,
     ) -> Result<SupertokensSignUpResponse, reqwest::Error> {
         let json_payload = serde_json::json!(payload);
-        Self::request_supertokens(SupertokensPath::SignUp, &json_payload).await
+        Self::post_request_supertokens(SupertokensPath::SignUp, &json_payload).await
     }
 
     pub async fn create_email_verification_token(
@@ -62,6 +68,15 @@ impl Supertokens {
         let mut map = HashMap::new();
         map.insert("userId", user_id.to_string());
         map.insert("email", email.to_string());
-        Self::request_supertokens(SupertokensPath::EmailVerificationToken, &map).await
+        Self::post_request_supertokens(SupertokensPath::EmailVerificationToken, &map).await
+    }
+
+    pub async fn verify_email(
+        token: &str,
+    ) -> Result<SupertokensEmailVerificationResponse, reqwest::Error> {
+        let mut map = HashMap::new();
+        map.insert("method", "token");
+        map.insert("token", token);
+        Self::post_request_supertokens(SupertokensPath::EmailVerification, &map).await
     }
 }

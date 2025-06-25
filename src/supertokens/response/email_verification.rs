@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 pub struct SupertokensEmailVerificationTokenResponse {
@@ -7,10 +7,10 @@ pub struct SupertokensEmailVerificationTokenResponse {
     pub token: String,
 }
 
-#[derive(Deserialize)]
+#[allow(non_snake_case)]
+#[derive(Deserialize, Serialize)]
 pub struct SupertokensEmailVerificationResponse {
-    #[allow(dead_code)]
-    status: String,
-    userId: String,
-    email: String,
+    pub status: String,
+    userId: Option<String>,
+    email: Option<String>,
 }
