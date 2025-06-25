@@ -1,5 +1,7 @@
-mod email_verification_token;
+mod email_verification;
 mod sign_up;
 
-pub use email_verification_token::SupertokensEmailVerificationTokenResponse;
+pub use email_verification::{
+    SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
+};
 pub use sign_up::SupertokensSignUpResponse;

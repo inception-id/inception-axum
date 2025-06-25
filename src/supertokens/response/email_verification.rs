@@ -6,3 +6,11 @@ pub struct SupertokensEmailVerificationTokenResponse {
     status: String,
     pub token: String,
 }
+
+#[derive(Deserialize)]
+pub struct SupertokensEmailVerificationResponse {
+    #[allow(dead_code)]
+    status: String,
+    userId: String,
+    email: String,
+}
