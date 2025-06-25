@@ -47,7 +47,7 @@ async fn register(
 
     let recipe_user_id = match supertokens.recipeUserId {
         Some(id) => id,
-        None => return JsonResponse::send(400, None, Some(supertokens.status)),
+        None => return JsonResponse::send(400, None, Some(supertokens.status.replace("_", " "))),
     };
 
     let supertokens_user_id = match uuid::Uuid::parse_str(&recipe_user_id) {
@@ -86,7 +86,7 @@ async fn verify_user(
             if supertokens.status == "OK" {
                 JsonResponse::send(200, Some(supertokens), None)
             } else {
-                JsonResponse::send(400, None, Some(supertokens.status))
+                JsonResponse::send(400, None, Some(supertokens.status.replace("_", " ")))
             }
         }
         Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
