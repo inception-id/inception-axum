@@ -3,7 +3,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use crate::{
     supertokens::response::{
         SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
-        SupertokensSignUpResponse,
+        SupertokensPasswordResetTokenResponse, SupertokensSignUpResponse,
     },
     users::RegisterUserPayload,
 };
@@ -78,5 +78,15 @@ impl Supertokens {
         map.insert("method", "token");
         map.insert("token", token);
         Self::post_request_supertokens(SupertokensPath::EmailVerification, &map).await
+    }
+
+    pub async fn create_password_reset_token(
+        user_id: &uuid::Uuid,
+        email: &str,
+    ) -> Result<SupertokensPasswordResetTokenResponse, reqwest::Error> {
+        let mut map = HashMap::new();
+        map.insert("userId", user_id.to_string());
+        map.insert("email", email.to_string());
+        Self::post_request_supertokens(SupertokensPath::PasswordResetToken, &map).await
     }
 }

@@ -63,7 +63,16 @@ async fn register(
     let verification_token =
         match Supertokens::create_email_verification_token(&supertokens_user_id, &user.email).await
         {
-            Ok(supertokens) => supertokens.token,
+            Ok(supertokens) => match supertokens.token {
+                Some(token) => token,
+                None => {
+                    return JsonResponse::send(
+                        400,
+                        None,
+                        Some(supertokens.status.replace("_", " ")),
+                    )
+                }
+            },
             Err(err) => return JsonResponse::send(201, Some(user), Some(err.to_string())),
         };
 
@@ -116,7 +125,16 @@ async fn send_user_verification(
     let verification_token =
         match Supertokens::create_email_verification_token(&supertokens_user_id, &user.email).await
         {
-            Ok(supertokens) => supertokens.token,
+            Ok(supertokens) => match supertokens.token {
+                Some(token) => token,
+                None => {
+                    return JsonResponse::send(
+                        400,
+                        None,
+                        Some(supertokens.status.replace("_", " ")),
+                    )
+                }
+            },
             Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
         };
 
