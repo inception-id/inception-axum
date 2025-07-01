@@ -103,14 +103,14 @@ async fn verify_user(
 }
 
 #[derive(Deserialize, Validate)]
-pub struct SendUserVerificationPayload {
+pub struct SendPasswordResetEmailPayload {
     #[validate(email(message = "Invalid Email"))]
     email: String,
 }
 
-async fn send_user_verification(
+async fn send_password_reset_email(
     State(pool): State<DbPool>,
-    Json(payload): Json<SendUserVerificationPayload>,
+    Json(payload): Json<SendPasswordResetEmailPayload>,
 ) -> AxumResponse<User> {
     let user = match User::find_by_email(&pool, &payload.email) {
         Ok(res) => res,
@@ -123,8 +123,7 @@ async fn send_user_verification(
     };
 
     let verification_token =
-        match Supertokens::create_email_verification_token(&supertokens_user_id, &user.email).await
-        {
+        match Supertokens::create_password_reset_token(&supertokens_user_id, &user.email).await {
             Ok(supertokens) => match supertokens.token {
                 Some(token) => token,
                 None => {
@@ -138,7 +137,7 @@ async fn send_user_verification(
             Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
         };
 
-    match Mail::send_register_verification_email(&user.email, &verification_token) {
+    match Mail::send_password_reset_email(&user.email, &verification_token) {
         Ok(_) => JsonResponse::send(200, None, None),
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     }
@@ -148,6 +147,6 @@ pub fn user_routes() -> Router<DbPool> {
     Router::new()
         .route("/register", post(register))
         .route("/verify", post(verify_user))
-        .route("/verify/send", post(send_user_verification))
+        .route("/password/reset", post(send_password_reset_email))
         .layer(from_fn(api_key_middleware))
 }

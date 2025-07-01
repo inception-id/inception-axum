@@ -77,10 +77,35 @@ impl Mail {
                     <body>
                         <h1>Hello!</h1>
                         <h3>Please verify your email address by clicking the link below:</h3>
-                        <a href='http://{frontend_url}/auth/login?t={verification_token}'>Verify Email</a>
+                        <a href='{frontend_url}/auth/login?t={verification_token}'>Verify Email</a>
 
                         <p>If the link doesn't work, copy and paste the following URL into your browser:</p>
-                        <p>http://{frontend_url}/auth/login?t={verification_token}</p>
+                        <p>{frontend_url}/auth/login?t={verification_token}</p>
+                    </body>
+                </html>
+            "
+        );
+
+        Self::send(&email, &subject, &content)
+    }
+
+    pub fn send_password_reset_email(
+        email: &str,
+        token: &str,
+    ) -> Result<lettre::transport::smtp::response::Response, lettre::error::Error> {
+        let subject = "Password Reset";
+        let frontend_url = env::var("FRONTEND_URL").expect("Missing FRONTEND_URL");
+        let content = format!(
+            "
+                <html>
+                    <title>Inception Password Reset</title>
+                    <body>
+                        <h1>Hello!</h1>
+                        <h3>We received a request to reset your password. Please verify your request by clicking the link below:</h3>
+                        <a href='{frontend_url}/auth/reset-password?t={token}'>Reset Password</a>
+
+                        <p>If the link doesn't work, copy and paste the following URL into your browser:</p>
+                        <p>{frontend_url}/auth/reset-password?t={token}</p>
                     </body>
                 </html>
             "
