@@ -4,9 +4,9 @@ mod middleware;
 mod schema;
 mod supertokens;
 mod users;
-
 use crate::db::build_db_pool;
 use crate::users::user_routes;
+use axum::http::HeaderValue;
 use axum::Router;
 use sentry_tower::{NewSentryLayer, SentryHttpLayer};
 use std::env;
@@ -17,8 +17,13 @@ use tower_http::trace::TraceLayer;
 async fn main() {
     dotenvy::dotenv().ok();
 
-    let pool = build_db_pool();
-    let cors = CorsLayer::permissive();
+    let app_env = env::var("APP_ENV");
+    let cors = match app_env {
+        Ok(env) if env == "production" => {
+            CorsLayer::new().allow_origin("https://inception.id".parse::<HeaderValue>().unwrap())
+        }
+        _ => CorsLayer::permissive(),
+    };
 
     let tracing_format = "tower_http::trace::make_span=debug,tower_http::trace::on_response=debug,tower_http::trace::on_request=debug";
     let tracing_filter = tracing_subscriber::EnvFilter::new(tracing_format);
@@ -37,6 +42,7 @@ async fn main() {
     ));
 
     // build our application with a route
+    let pool = build_db_pool();
     let app = Router::new()
         .nest("/users", user_routes())
         .with_state(pool)
