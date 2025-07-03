@@ -3,6 +3,8 @@ pub(super) enum SupertokensPath {
     EmailVerificationToken,
     EmailVerification,
     PasswordResetToken,
+    PasswordResetTokenConsume,
+    UpdateUser,
 }
 
 impl SupertokensPath {
@@ -12,6 +14,10 @@ impl SupertokensPath {
             Self::EmailVerificationToken => "/recipe/user/email/verify/token".to_string(),
             Self::EmailVerification => "/recipe/user/email/verify".to_string(),
             Self::PasswordResetToken => "/recipe/user/password/reset/token".to_string(),
+            Self::PasswordResetTokenConsume => {
+                "/recipe/user/password/reset/token/consume".to_string()
+            }
+            Self::UpdateUser => "/recipe/user".to_string(),
         }
     }
 }

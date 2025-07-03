@@ -3,7 +3,8 @@ use serde::{de::DeserializeOwned, Serialize};
 use crate::{
     supertokens::response::{
         SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
-        SupertokensPasswordResetTokenResponse, SupertokensSignUpResponse,
+        SupertokensPasswordResetTokenConsumeResponse, SupertokensPasswordResetTokenResponse,
+        SupertokensSignUpResponse, SupertokensUpdateUserResponse,
     },
     users::RegisterUserPayload,
 };
@@ -54,6 +55,29 @@ impl Supertokens {
             .await
     }
 
+    async fn put_request_supertokens<T, U>(
+        path: SupertokensPath,
+        json: &T,
+    ) -> Result<U, reqwest::Error>
+    where
+        T: Serialize,
+        U: DeserializeOwned,
+    {
+        let supertokens = Supertokens::new(path);
+        let url = format!("{}{}", &supertokens.connection_uri, &supertokens.path);
+
+        let client = reqwest::Client::new();
+
+        client
+            .put(url)
+            .header("Authorization", &supertokens.api_key)
+            .json(json)
+            .send()
+            .await?
+            .json()
+            .await
+    }
+
     pub async fn sign_up(
         payload: &RegisterUserPayload,
     ) -> Result<SupertokensSignUpResponse, reqwest::Error> {
@@ -88,5 +112,21 @@ impl Supertokens {
         map.insert("userId", user_id.to_string());
         map.insert("email", email.to_string());
         Self::post_request_supertokens(SupertokensPath::PasswordResetToken, &map).await
+    }
+    pub async fn consume_password_reset_token(
+        token: &str,
+    ) -> Result<SupertokensPasswordResetTokenConsumeResponse, reqwest::Error> {
+        let mut map = HashMap::new();
+        map.insert("token", token.to_string());
+        Self::post_request_supertokens(SupertokensPath::PasswordResetTokenConsume, &map).await
+    }
+    pub async fn update_password(
+        supertokens_user_id: &str,
+        password: &str,
+    ) -> Result<SupertokensUpdateUserResponse, reqwest::Error> {
+        let mut map = HashMap::new();
+        map.insert("recipeUserId", supertokens_user_id.to_string());
+        map.insert("password", password.to_string());
+        Self::put_request_supertokens(SupertokensPath::UpdateUser, &map).await
     }
 }
