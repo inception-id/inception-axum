@@ -36,4 +36,14 @@ impl User {
             .filter(schema::users::email.eq(email))
             .get_result(conn)
     }
+
+    pub(super) fn find_by_supertokens_id(
+        pool: &DbPool,
+        supertokens_id: &uuid::Uuid,
+    ) -> QueryResult<User> {
+        let conn = &mut pool.get().expect("Couldn't get db connection from pool");
+        schema::users::table
+            .filter(schema::users::supertokens_user_id.eq(supertokens_id))
+            .get_result(conn)
+    }
 }

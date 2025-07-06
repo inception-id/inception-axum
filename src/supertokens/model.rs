@@ -4,7 +4,7 @@ use crate::{
     supertokens::response::{
         SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
         SupertokensPasswordResetTokenConsumeResponse, SupertokensPasswordResetTokenResponse,
-        SupertokensSignUpResponse, SupertokensUpdateUserResponse,
+        SupertokensSignInResponse, SupertokensSignUpResponse, SupertokensUpdateUserResponse,
     },
     users::RegisterUserPayload,
 };
@@ -83,6 +83,16 @@ impl Supertokens {
     ) -> Result<SupertokensSignUpResponse, reqwest::Error> {
         let json_payload = serde_json::json!(payload);
         Self::post_request_supertokens(SupertokensPath::SignUp, &json_payload).await
+    }
+
+    pub async fn sign_in(
+        email: &str,
+        password: &str,
+    ) -> Result<SupertokensSignInResponse, reqwest::Error> {
+        let mut map = HashMap::new();
+        map.insert("email", email.to_string());
+        map.insert("password", password.to_string());
+        Self::post_request_supertokens(SupertokensPath::SignIn, &map).await
     }
 
     pub async fn create_email_verification_token(

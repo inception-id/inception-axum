@@ -172,11 +172,49 @@ async fn reset_password(Json(payload): Json<ResetPasswordPayload>) -> AxumRespon
     }
 }
 
+#[derive(Deserialize, Serialize, Validate)]
+pub struct LoginUserPayload {
+    #[validate(email(message = "Invalid Email"))]
+    email: String,
+    password: String,
+}
+
+async fn login(
+    State(pool): State<DbPool>,
+    Json(payload): Json<LoginUserPayload>,
+) -> AxumResponse<User> {
+    let supertokens_user = match Supertokens::sign_in(&payload.email, &payload.password).await {
+        Ok(supertokens) => {
+            let message = Some(supertokens.status.replace("_", " "));
+            if supertokens.status == "OK" {
+                match supertokens.user {
+                    Some(user) => user,
+                    None => return JsonResponse::send(400, None, message),
+                }
+            } else {
+                return JsonResponse::send(400, None, message);
+            }
+        }
+        Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+    };
+
+    let supertokens_user_id = match uuid::Uuid::parse_str(&supertokens_user.id) {
+        Ok(uuid) => uuid,
+        Err(err) => return JsonResponse::send(400, None, Some(err.to_string())),
+    };
+
+    match User::find_by_supertokens_id(&pool, &supertokens_user_id) {
+        Ok(user) => JsonResponse::send(200, Some(user), None),
+        Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
+    }
+}
+
 pub fn user_routes() -> Router<DbPool> {
     Router::new()
         .route("/register", post(register))
         .route("/verify", post(verify_user))
         .route("/password/reset/email", post(send_password_reset_email))
         .route("/password/reset", post(reset_password))
+        .route("/login", post(login))
         .layer(from_fn(api_key_middleware))
 }
