@@ -203,9 +203,32 @@ async fn login(
         Err(err) => return JsonResponse::send(400, None, Some(err.to_string())),
     };
 
-    match User::find_by_supertokens_id(&pool, &supertokens_user_id) {
-        Ok(user) => JsonResponse::send(200, Some(user), None),
-        Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
+    if supertokens_user.loginMethods[0].verified {
+        match User::find_by_supertokens_id(&pool, &supertokens_user_id) {
+            Ok(user) => JsonResponse::send(200, Some(user), None),
+            Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
+        }
+    } else {
+        let email = &supertokens_user.loginMethods[0].email;
+        let verification_token =
+            match Supertokens::create_email_verification_token(&supertokens_user_id, email).await {
+                Ok(supertokens) => match supertokens.token {
+                    Some(token) => token,
+                    None => {
+                        return JsonResponse::send(
+                            400,
+                            None,
+                            Some(supertokens.status.replace("_", " ")),
+                        )
+                    }
+                },
+                Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+            };
+
+        match Mail::send_register_verification_email(email, &verification_token) {
+            Ok(_) => JsonResponse::send(403, None, None),
+            Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+        }
     }
 }
 

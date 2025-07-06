@@ -1,9 +1,9 @@
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-struct SupertokensLoginMethod {
+pub struct SupertokensLoginMethod {
     pub verified: bool,
-    email: String,
+    pub email: String,
 }
 
 #[allow(non_snake_case)]

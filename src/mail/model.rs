@@ -68,12 +68,12 @@ impl Mail {
         email: &str,
         verification_token: &str,
     ) -> Result<lettre::transport::smtp::response::Response, lettre::error::Error> {
-        let subject = "Registration Verification";
+        let subject = "Email Verification";
         let frontend_url = env::var("FRONTEND_URL").expect("Missing FRONTEND_URL");
         let content = format!(
             "
                 <html>
-                    <title>Inception Registration Verification</title>
+                    <title>Inception Email Verification</title>
                     <body>
                         <h1>Hello!</h1>
                         <h3>Please verify your email address by clicking the link below:</h3>
