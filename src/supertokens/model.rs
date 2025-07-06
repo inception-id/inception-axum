@@ -1,12 +1,16 @@
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
-    supertokens::response::{
-        SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
-        SupertokensPasswordResetTokenConsumeResponse, SupertokensPasswordResetTokenResponse,
-        SupertokensSignInResponse, SupertokensSignUpResponse, SupertokensUpdateUserResponse,
+    supertokens::{
+        request::SupertokensNewSessionRequest,
+        response::{
+            SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
+            SupertokensNewSessionResponse, SupertokensPasswordResetTokenConsumeResponse,
+            SupertokensPasswordResetTokenResponse, SupertokensSignInResponse,
+            SupertokensSignUpResponse, SupertokensUpdateUserResponse,
+        },
     },
-    users::RegisterUserPayload,
+    users::{RegisterUserPayload, User},
 };
 
 use super::paths::SupertokensPath;
@@ -138,5 +142,14 @@ impl Supertokens {
         map.insert("recipeUserId", supertokens_user_id.to_string());
         map.insert("password", password.to_string());
         Self::put_request_supertokens(SupertokensPath::UpdateUser, &map).await
+    }
+
+    pub async fn create_new_session(
+        supertokens_user_id: &str,
+        user: &User,
+    ) -> Result<SupertokensNewSessionResponse, reqwest::Error> {
+        let session_request = SupertokensNewSessionRequest::new(supertokens_user_id, user);
+        let json_payload = serde_json::json!(session_request);
+        Self::post_request_supertokens(SupertokensPath::NewSession, &json_payload).await
     }
 }

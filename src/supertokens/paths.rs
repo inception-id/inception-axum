@@ -6,6 +6,7 @@ pub(super) enum SupertokensPath {
     PasswordResetToken,
     PasswordResetTokenConsume,
     UpdateUser,
+    NewSession,
 }
 
 impl SupertokensPath {
@@ -20,6 +21,7 @@ impl SupertokensPath {
                 "/recipe/user/password/reset/token/consume".to_string()
             }
             Self::UpdateUser => "/recipe/user".to_string(),
+            Self::NewSession => "/recipe/session".to_string(),
         }
     }
 }

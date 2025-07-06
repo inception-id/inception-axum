@@ -3,7 +3,9 @@ use crate::{
     db::DbPool,
     mail::Mail,
     middleware::{api_key_middleware, AxumResponse, JsonResponse, RE_PHONE},
-    supertokens::{Supertokens, SupertokensEmailVerificationResponse},
+    supertokens::{
+        Supertokens, SupertokensEmailVerificationResponse, SupertokensNewSessionResponse,
+    },
 };
 use axum::{
     extract::{Json, State},
@@ -182,7 +184,7 @@ pub struct LoginUserPayload {
 async fn login(
     State(pool): State<DbPool>,
     Json(payload): Json<LoginUserPayload>,
-) -> AxumResponse<User> {
+) -> AxumResponse<SupertokensNewSessionResponse> {
     let supertokens_user = match Supertokens::sign_in(&payload.email, &payload.password).await {
         Ok(supertokens) => {
             let message = Some(supertokens.status.replace("_", " "));
@@ -204,8 +206,13 @@ async fn login(
     };
 
     if supertokens_user.loginMethods[0].verified {
-        match User::find_by_supertokens_id(&pool, &supertokens_user_id) {
-            Ok(user) => JsonResponse::send(200, Some(user), None),
+        let user = match User::find_by_supertokens_id(&pool, &supertokens_user_id) {
+            Ok(res) => res,
+            Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
+        };
+
+        match Supertokens::create_new_session(&supertokens_user.id, &user).await {
+            Ok(session) => JsonResponse::send(200, Some(session), None),
             Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
         }
     } else {

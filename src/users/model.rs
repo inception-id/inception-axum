@@ -3,8 +3,8 @@ use serde::Serialize;
 
 use crate::{db::DbPool, schema, users::RegisterUserPayload};
 
-#[derive(Queryable, Serialize)]
-pub(super) struct User {
+#[derive(Queryable, Serialize, Clone)]
+pub struct User {
     pub id: uuid::Uuid,
     pub supertokens_user_id: Option<uuid::Uuid>,
     created_at: chrono::NaiveDateTime,
