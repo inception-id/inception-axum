@@ -1,5 +1,5 @@
-mod request;
-mod routes;
-mod services;
+mod controller;
+mod model;
 
-pub use routes::user_routes;
+pub use controller::{user_routes, RegisterUserPayload};
+pub use model::User;
