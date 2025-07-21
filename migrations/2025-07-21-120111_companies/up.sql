@@ -1,0 +1,26 @@
+-- Your SQL goes here
+
+CREATE TABLE companies (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW (),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW (),
+    name VARCHAR NOT NULL,
+    phone VARCHAR(255) NOT NULL,
+    api_key VARCHAR(255) NOT NULL
+);
+
+SELECT
+    diesel_manage_updated_at ('companies');
+
+CREATE TYPE company_user_permission AS ENUM ('owner', 'editor', 'viewer');
+
+CREATE TABLE companies_users (
+    company_id uuid REFERENCES companies (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    user_id uuid REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW (),
+    permission company_user_permission NOT NULL DEFAULT 'viewer',
+    CONSTRAINT companies_users_pkey PRIMARY KEY (company_id, user_id)
+);
+
+SELECT
+    diesel_manage_updated_at ('companies_users');
