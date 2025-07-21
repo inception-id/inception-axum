@@ -1,3 +1,4 @@
+mod companies;
 mod db;
 mod mail;
 mod middleware;
@@ -51,7 +52,7 @@ async fn main() {
         .layer(NewSentryLayer::new_from_top())
         .layer(SentryHttpLayer::new().enable_transaction());
 
-    // run our app with hyper, listening globally on env port
+    // run our app, listening globally on env port
     let host_addr = env::var("HOST_ADDRESS").expect("Missing HOST_ADDRESS");
     let listener = tokio::net::TcpListener::bind(&host_addr).await.unwrap();
 
