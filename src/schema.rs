@@ -2,8 +2,8 @@
 
 pub mod sql_types {
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "company_user_permission"))]
-    pub struct CompanyUserPermission;
+    #[diesel(postgres_type(name = "companies_users_permission"))]
+    pub struct CompaniesUsersPermission;
 }
 
 diesel::table! {
@@ -21,13 +21,13 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use super::sql_types::CompanyUserPermission;
+    use super::sql_types::CompaniesUsersPermission;
 
     companies_users (company_id, user_id) {
         company_id -> Uuid,
         user_id -> Uuid,
         updated_at -> Timestamp,
-        permission -> CompanyUserPermission,
+        permission -> CompaniesUsersPermission,
     }
 }
 

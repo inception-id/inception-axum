@@ -12,13 +12,13 @@ CREATE TABLE companies (
 SELECT
     diesel_manage_updated_at ('companies');
 
-CREATE TYPE company_user_permission AS ENUM ('owner', 'editor', 'viewer');
+CREATE TYPE companies_users_permission AS ENUM ('owner', 'edit', 'view');
 
 CREATE TABLE companies_users (
     company_id uuid REFERENCES companies (id) ON UPDATE CASCADE ON DELETE CASCADE,
     user_id uuid REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW (),
-    permission company_user_permission NOT NULL DEFAULT 'viewer',
+    permission companies_users_permission NOT NULL DEFAULT 'view',
     CONSTRAINT companies_users_pkey PRIMARY KEY (company_id, user_id)
 );
 

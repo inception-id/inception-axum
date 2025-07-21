@@ -1,5 +1,7 @@
 mod companies;
+mod companies_users;
 mod db;
+mod enums;
 mod mail;
 mod middleware;
 mod schema;
