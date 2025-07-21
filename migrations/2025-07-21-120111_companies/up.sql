@@ -17,6 +17,7 @@ CREATE TYPE companies_users_permission AS ENUM ('owner', 'edit', 'view');
 CREATE TABLE companies_users (
     company_id uuid REFERENCES companies (id) ON UPDATE CASCADE ON DELETE CASCADE,
     user_id uuid REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW (),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW (),
     permission companies_users_permission NOT NULL DEFAULT 'view',
     CONSTRAINT companies_users_pkey PRIMARY KEY (company_id, user_id)

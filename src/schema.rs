@@ -26,6 +26,7 @@ diesel::table! {
     companies_users (company_id, user_id) {
         company_id -> Uuid,
         user_id -> Uuid,
+        created_at -> Timestamp,
         updated_at -> Timestamp,
         permission -> CompaniesUsersPermission,
     }
