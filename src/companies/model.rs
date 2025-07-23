@@ -6,7 +6,7 @@ use serde::Serialize;
 
 #[derive(Queryable, Serialize)]
 pub struct Company {
-    id: uuid::Uuid,
+    pub id: uuid::Uuid,
     created_at: chrono::NaiveDateTime,
     updated_at: chrono::NaiveDateTime,
     name: String,
@@ -15,13 +15,13 @@ pub struct Company {
 }
 
 impl Company {
-    fn generate_api_key() -> Result<String, BcryptError> {
+    pub fn generate_api_key() -> Result<String, BcryptError> {
         let new_uuid = uuid::Uuid::new_v4().to_string();
         let base64_uuid = BASE64_STANDARD.encode(new_uuid);
         hash(base64_uuid, DEFAULT_COST)
     }
 
-    fn create(pool: DbPool, name: &str, phone: &str, api_key: &str) -> QueryResult<Company> {
+    pub fn create(pool: &DbPool, name: &str, phone: &str, api_key: &str) -> QueryResult<Company> {
         let conn = &mut pool.get().expect("Couldn't get db connection from pool");
         let values = (
             schema::companies::name.eq(name),

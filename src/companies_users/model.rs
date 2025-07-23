@@ -12,8 +12,8 @@ pub struct CompanyUser {
 }
 
 impl CompanyUser {
-    fn create(
-        pool: DbPool,
+    pub fn create(
+        pool: &DbPool,
         company_id: &uuid::Uuid,
         user_id: &uuid::Uuid,
         permission: &CompanyUserPermission,

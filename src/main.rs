@@ -7,6 +7,7 @@ mod middleware;
 mod schema;
 mod supertokens;
 mod users;
+use crate::companies::company_routes;
 use crate::db::build_db_pool;
 use crate::users::user_routes;
 use axum::http::HeaderValue;
@@ -48,6 +49,7 @@ async fn main() {
     let pool = build_db_pool();
     let app = Router::new()
         .nest("/users", user_routes())
+        .nest("/companies", company_routes())
         .with_state(pool)
         .layer(cors)
         .layer(TraceLayer::new_for_http())

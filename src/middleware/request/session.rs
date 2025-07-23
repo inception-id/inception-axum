@@ -1,4 +1,5 @@
 use axum::{extract, http, middleware, response};
+use serde::Serialize;
 
 use crate::{
     middleware::{AxumResponse, JsonResponse},
@@ -42,5 +43,26 @@ pub async fn session_middleware(
             };
         }
         None => Err(JsonResponse::send(401, None, None)),
+    }
+}
+
+pub fn extract_session_user_id<T: Serialize>(
+    header_map: &http::HeaderMap,
+) -> Result<uuid::Uuid, AxumResponse<T>> {
+    let header_user_id = match header_map.get("x-user-id") {
+        Some(id) => id,
+        None => {
+            return Err(JsonResponse::send(401, None, None));
+        }
+    };
+    let user_id = match header_user_id.to_str() {
+        Ok(id) => id,
+        Err(err) => {
+            return Err(JsonResponse::send(500, None, Some(err.to_string())));
+        }
+    };
+    match uuid::Uuid::parse_str(user_id) {
+        Ok(id) => Ok(id),
+        Err(err) => Err(JsonResponse::send(500, None, Some(err.to_string()))),
     }
 }
