@@ -8,6 +8,7 @@ use crate::{
             SupertokensNewSessionResponse, SupertokensPasswordResetTokenConsumeResponse,
             SupertokensPasswordResetTokenResponse, SupertokensSignInResponse,
             SupertokensSignUpResponse, SupertokensUpdateUserResponse,
+            SupertokensVerifySessionResponse,
         },
     },
     users::{RegisterUserPayload, User},
@@ -151,5 +152,17 @@ impl Supertokens {
         let session_request = SupertokensNewSessionRequest::new(supertokens_user_id, user);
         let json_payload = serde_json::json!(session_request);
         Self::post_request_supertokens(SupertokensPath::NewSession, &json_payload).await
+    }
+
+    pub async fn verify_session(
+        access_token: &str,
+    ) -> Result<SupertokensVerifySessionResponse, reqwest::Error> {
+        let json_payload = serde_json::json!({
+            "accessToken": access_token,
+            "enableAntiCsrf": false,
+            "doAntiCsrfCheck": false,
+            "checkDatabase": true
+        });
+        Self::post_request_supertokens(SupertokensPath::VerifySession, &json_payload).await
     }
 }

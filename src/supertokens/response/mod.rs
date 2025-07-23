@@ -4,6 +4,7 @@ mod password_reset;
 mod sign_in;
 mod sign_up;
 mod update_user;
+mod verify_session;
 
 pub use email_verification::SupertokensEmailVerificationResponse;
 pub(crate) use email_verification::SupertokensEmailVerificationTokenResponse;
@@ -14,3 +15,4 @@ pub(crate) use password_reset::{
 pub(crate) use sign_in::SupertokensSignInResponse;
 pub(crate) use sign_up::SupertokensSignUpResponse;
 pub(crate) use update_user::SupertokensUpdateUserResponse;
+pub use verify_session::SupertokensVerifySessionResponse;
