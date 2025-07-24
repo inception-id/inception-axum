@@ -11,14 +11,15 @@ pub struct Company {
     updated_at: chrono::NaiveDateTime,
     name: String,
     phone: String,
-    api_key: String,
+    pub api_key: String,
 }
 
 impl Company {
-    pub fn generate_api_key() -> Result<String, BcryptError> {
+    pub fn generate_api_key() -> Result<(String, String), BcryptError> {
         let new_uuid = uuid::Uuid::new_v4().to_string();
         let base64_uuid = BASE64_STANDARD.encode(new_uuid);
-        hash(base64_uuid, DEFAULT_COST)
+        let hashed_key = hash(&base64_uuid, DEFAULT_COST)?;
+        Ok((base64_uuid, hashed_key))
     }
 
     pub fn create(pool: &DbPool, name: &str, phone: &str, api_key: &str) -> QueryResult<Company> {

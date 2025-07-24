@@ -46,13 +46,18 @@ async fn create_company(
         Ok(api_key) => api_key,
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     };
-    let company = match Company::create(&pool, &payload.name, &payload.phone, &api_key) {
+
+    // save the hashed key to db and send the raw to user
+    let mut company = match Company::create(&pool, &payload.name, &payload.phone, &api_key.1) {
         Ok(company) => company,
         Err(err) => return JsonResponse::send(500, None, Some(err.to_string())),
     };
 
     match CompanyUser::create(&pool, &company.id, &user_id, &CompanyUserPermission::Owner) {
-        Ok(_) => JsonResponse::send(201, Some(company), None),
+        Ok(_) => {
+            company.api_key = api_key.0;
+            JsonResponse::send(201, Some(company), None)
+        }
         Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
     }
 }
