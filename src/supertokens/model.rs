@@ -6,8 +6,8 @@ use crate::{
         response::{
             SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
             SupertokensNewSessionResponse, SupertokensPasswordResetTokenConsumeResponse,
-            SupertokensPasswordResetTokenResponse, SupertokensSignInResponse,
-            SupertokensSignUpResponse, SupertokensUpdateUserResponse,
+            SupertokensPasswordResetTokenResponse, SupertokensRemoveSessionResponse,
+            SupertokensSignInResponse, SupertokensSignUpResponse, SupertokensUpdateUserResponse,
             SupertokensVerifySessionResponse,
         },
     },
@@ -172,5 +172,12 @@ impl Supertokens {
         let json_payload = serde_json::json!(session_request);
 
         Self::post_request_supertokens(SupertokensPath::RefreshSession, &json_payload).await
+    }
+    pub async fn remove_session(
+        user_id: &str,
+    ) -> Result<SupertokensRemoveSessionResponse, reqwest::Error> {
+        let mut map = HashMap::new();
+        map.insert("userId", user_id.to_string());
+        Self::post_request_supertokens(SupertokensPath::RemoveSession, &map).await
     }
 }
