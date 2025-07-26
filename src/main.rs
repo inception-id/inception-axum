@@ -5,11 +5,15 @@ mod enums;
 mod mail;
 mod middleware;
 mod schema;
+mod sessions;
 mod supertokens;
 mod users;
+
 use crate::companies::company_routes;
 use crate::db::build_db_pool;
+use crate::sessions::session_routes;
 use crate::users::user_routes;
+
 use axum::http::HeaderValue;
 use axum::Router;
 use sentry_tower::{NewSentryLayer, SentryHttpLayer};
@@ -50,6 +54,7 @@ async fn main() {
     let app = Router::new()
         .nest("/users", user_routes())
         .nest("/companies", company_routes())
+        .nest("/sessions", session_routes())
         .with_state(pool)
         .layer(cors)
         .layer(TraceLayer::new_for_http())
