@@ -38,7 +38,13 @@ pub async fn session_middleware(
                     new_req.headers_mut().insert("x-user-id", x_user_id);
                     return Ok(next.run(new_req).await);
                 }
-                Ok(session) => return Err(JsonResponse::send(403, None, Some(session.status))),
+                Ok(session) => {
+                    return Err(JsonResponse::send(
+                        403,
+                        None,
+                        Some(session.status.replace("_", " ")),
+                    ))
+                }
                 Err(err) => return Err(JsonResponse::send(500, None, Some(err.to_string()))),
             };
         }
