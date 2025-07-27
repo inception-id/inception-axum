@@ -1,10 +1,15 @@
-use axum::{middleware::from_fn, routing::post, Json, Router};
+use axum::{
+    extract::Path,
+    middleware::from_fn,
+    routing::{delete, post},
+    Json, Router,
+};
 use serde::Deserialize;
 
 use crate::{
     db::DbPool,
     middleware::{api_key_middleware, AxumResponse, JsonResponse},
-    supertokens::{Supertokens, SupertokensNewSessionResponse},
+    supertokens::{Supertokens, SupertokensNewSessionResponse, SupertokensRemoveSessionResponse},
 };
 
 #[derive(Deserialize)]
@@ -41,9 +46,19 @@ async fn refresh_session(
     }
 }
 
+async fn remove_session(
+    Path(supertokens_user_id): Path<String>,
+) -> AxumResponse<SupertokensRemoveSessionResponse> {
+    match Supertokens::remove_session(&supertokens_user_id).await {
+        Ok(supertokens) => JsonResponse::send(200, Some(supertokens), None),
+        Err(err) => JsonResponse::send(500, None, Some(err.to_string())),
+    }
+}
+
 pub fn session_routes() -> Router<DbPool> {
     Router::new()
         .route("/verify", post(verify_session))
         .route("/refresh", post(refresh_session))
+        .route("/remove/{supertokens_user_id}", delete(remove_session))
         .layer(from_fn(api_key_middleware))
 }

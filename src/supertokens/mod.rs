@@ -4,4 +4,7 @@ mod request;
 mod response;
 
 pub use model::Supertokens;
-pub use response::{SupertokensEmailVerificationResponse, SupertokensNewSessionResponse};
+pub use response::{
+    SupertokensEmailVerificationResponse, SupertokensNewSessionResponse,
+    SupertokensRemoveSessionResponse,
+};
