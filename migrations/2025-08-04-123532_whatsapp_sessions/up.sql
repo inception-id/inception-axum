@@ -4,7 +4,8 @@ CREATE TABLE whatsapp_sessions (
     user_id uuid NOT NULL REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW (),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW (),
-    phone VARCHAR(255) NOT NULL
+    phone VARCHAR(255) NOT NULL,
+    is_ready BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 SELECT

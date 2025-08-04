@@ -21,6 +21,7 @@ diesel::table! {
         updated_at -> Timestamp,
         #[max_length = 255]
         phone -> Varchar,
+        is_ready -> Bool,
     }
 }
 
