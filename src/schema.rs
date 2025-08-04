@@ -12,3 +12,21 @@ diesel::table! {
         phone -> Nullable<Varchar>,
     }
 }
+
+diesel::table! {
+    whatsapp_sessions (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        #[max_length = 255]
+        phone -> Varchar,
+    }
+}
+
+diesel::joinable!(whatsapp_sessions -> users (user_id));
+
+diesel::allow_tables_to_appear_in_same_query!(
+    users,
+    whatsapp_sessions,
+);
