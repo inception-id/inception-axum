@@ -1,7 +1,4 @@
-mod companies;
-mod companies_users;
 mod db;
-mod enums;
 mod mail;
 mod middleware;
 mod schema;
@@ -9,7 +6,6 @@ mod sessions;
 mod supertokens;
 mod users;
 
-use crate::companies::company_routes;
 use crate::db::build_db_pool;
 use crate::sessions::session_routes;
 use crate::users::user_routes;
@@ -53,7 +49,6 @@ async fn main() {
     let pool = build_db_pool();
     let app = Router::new()
         .nest("/users", user_routes())
-        .nest("/companies", company_routes())
         .nest("/sessions", session_routes())
         .with_state(pool)
         .layer(cors)
