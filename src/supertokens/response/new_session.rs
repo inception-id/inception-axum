@@ -12,6 +12,6 @@ pub struct SupertokensNewSessionToken {
 #[derive(Deserialize, Serialize)]
 pub struct SupertokensNewSessionResponse {
     pub status: String,
-    accessToken: SupertokensNewSessionToken,
-    refreshToken: SupertokensNewSessionToken,
+    accessToken: Option<SupertokensNewSessionToken>,
+    refreshToken: Option<SupertokensNewSessionToken>,
 }

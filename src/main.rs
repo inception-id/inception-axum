@@ -2,10 +2,14 @@ mod db;
 mod mail;
 mod middleware;
 mod schema;
+mod sessions;
 mod supertokens;
 mod users;
+
 use crate::db::build_db_pool;
+use crate::sessions::session_routes;
 use crate::users::user_routes;
+
 use axum::http::HeaderValue;
 use axum::Router;
 use sentry_tower::{NewSentryLayer, SentryHttpLayer};
@@ -45,13 +49,14 @@ async fn main() {
     let pool = build_db_pool();
     let app = Router::new()
         .nest("/users", user_routes())
+        .nest("/sessions", session_routes())
         .with_state(pool)
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .layer(NewSentryLayer::new_from_top())
         .layer(SentryHttpLayer::new().enable_transaction());
 
-    // run our app with hyper, listening globally on env port
+    // run our app, listening globally on env port
     let host_addr = env::var("HOST_ADDRESS").expect("Missing HOST_ADDRESS");
     let listener = tokio::net::TcpListener::bind(&host_addr).await.unwrap();
 

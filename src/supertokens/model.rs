@@ -2,12 +2,13 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
     supertokens::{
-        request::SupertokensNewSessionRequest,
+        request::{SupertokensNewSessionRequest, SupertokensRefreshSessionRequest},
         response::{
             SupertokensEmailVerificationResponse, SupertokensEmailVerificationTokenResponse,
             SupertokensNewSessionResponse, SupertokensPasswordResetTokenConsumeResponse,
-            SupertokensPasswordResetTokenResponse, SupertokensSignInResponse,
-            SupertokensSignUpResponse, SupertokensUpdateUserResponse,
+            SupertokensPasswordResetTokenResponse, SupertokensRemoveSessionResponse,
+            SupertokensSignInResponse, SupertokensSignUpResponse, SupertokensUpdateUserResponse,
+            SupertokensVerifySessionResponse,
         },
     },
     users::{RegisterUserPayload, User},
@@ -151,5 +152,32 @@ impl Supertokens {
         let session_request = SupertokensNewSessionRequest::new(supertokens_user_id, user);
         let json_payload = serde_json::json!(session_request);
         Self::post_request_supertokens(SupertokensPath::NewSession, &json_payload).await
+    }
+
+    pub async fn verify_session(
+        access_token: &str,
+    ) -> Result<SupertokensVerifySessionResponse, reqwest::Error> {
+        let json_payload = serde_json::json!({
+            "accessToken": access_token,
+            "enableAntiCsrf": false,
+            "doAntiCsrfCheck": false,
+            "checkDatabase": true
+        });
+        Self::post_request_supertokens(SupertokensPath::VerifySession, &json_payload).await
+    }
+    pub async fn refresh_session(
+        refresh_token: &str,
+    ) -> Result<SupertokensNewSessionResponse, reqwest::Error> {
+        let session_request = SupertokensRefreshSessionRequest::new(refresh_token);
+        let json_payload = serde_json::json!(session_request);
+
+        Self::post_request_supertokens(SupertokensPath::RefreshSession, &json_payload).await
+    }
+    pub async fn remove_session(
+        user_id: &str,
+    ) -> Result<SupertokensRemoveSessionResponse, reqwest::Error> {
+        let mut map = HashMap::new();
+        map.insert("userId", user_id.to_string());
+        Self::post_request_supertokens(SupertokensPath::RemoveSession, &map).await
     }
 }

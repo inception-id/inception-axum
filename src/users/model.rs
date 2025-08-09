@@ -1,9 +1,9 @@
 use diesel::{prelude::Queryable, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{db::DbPool, schema, users::RegisterUserPayload};
 
-#[derive(Queryable, Serialize, Clone)]
+#[derive(Queryable, Serialize, Clone, Deserialize)]
 pub struct User {
     pub id: uuid::Uuid,
     pub supertokens_user_id: Option<uuid::Uuid>,
