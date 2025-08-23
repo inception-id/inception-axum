@@ -44,6 +44,7 @@ diesel::table! {
         #[max_length = 255]
         phone -> Varchar,
         is_ready -> Bool,
+        is_deleted -> Bool,
     }
 }
 
