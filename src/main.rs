@@ -1,3 +1,4 @@
+mod api_keys;
 mod db;
 mod mail;
 mod middleware;
@@ -6,6 +7,7 @@ mod sessions;
 mod supertokens;
 mod users;
 
+use crate::api_keys::api_key_routes;
 use crate::db::build_db_pool;
 use crate::sessions::session_routes;
 use crate::users::user_routes;
@@ -49,6 +51,7 @@ async fn main() {
     let pool = build_db_pool();
     let app = Router::new()
         .nest("/users", user_routes())
+        .nest("/api-keys", api_key_routes())
         .nest("/sessions", session_routes())
         .with_state(pool)
         .layer(cors)

@@ -1,5 +1,6 @@
 use axum::{extract, http, middleware, response};
 use serde::Serialize;
+use std::io::ErrorKind;
 
 use crate::{
     middleware::{AxumResponse, JsonResponse},
@@ -51,21 +52,26 @@ pub async fn session_middleware(
 
 pub fn extract_session_user_id<T: Serialize>(
     header_map: &http::HeaderMap,
-) -> Result<uuid::Uuid, AxumResponse<T>> {
+) -> Result<uuid::Uuid, std::io::Error> {
     let header_user_id = match header_map.get("x-user-id") {
         Some(id) => id,
         None => {
-            return Err(JsonResponse::send(401, None, None));
+            let new_err = std::io::Error::new(ErrorKind::Other, "Unauthorized".to_string());
+            return Err(new_err);
         }
     };
     let user_id = match header_user_id.to_str() {
         Ok(id) => id,
         Err(err) => {
-            return Err(JsonResponse::send(500, None, Some(err.to_string())));
+            let new_err = std::io::Error::new(ErrorKind::Other, err.to_string());
+            return Err(new_err);
         }
     };
     match uuid::Uuid::parse_str(user_id) {
         Ok(id) => Ok(id),
-        Err(err) => Err(JsonResponse::send(500, None, Some(err.to_string()))),
+        Err(err) => {
+            let new_err = std::io::Error::new(ErrorKind::Other, err.to_string());
+            return Err(new_err);
+        }
     }
 }
