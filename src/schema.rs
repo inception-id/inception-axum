@@ -7,6 +7,17 @@ pub mod sql_types {
 }
 
 diesel::table! {
+    api_keys (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        #[max_length = 255]
+        api_key -> Varchar,
+    }
+}
+
+diesel::table! {
     users (id) {
         id -> Uuid,
         supertokens_user_id -> Nullable<Uuid>,
@@ -48,10 +59,12 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(api_keys -> users (user_id));
 diesel::joinable!(whatsapp_messages -> whatsapp_sessions (session_id));
 diesel::joinable!(whatsapp_sessions -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    api_keys,
     users,
     whatsapp_messages,
     whatsapp_sessions,
