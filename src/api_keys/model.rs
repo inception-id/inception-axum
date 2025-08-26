@@ -1,19 +1,21 @@
 use base64::prelude::*;
-use bcrypt::{hash, verify, BcryptError, DEFAULT_COST};
-use diesel::{prelude::Queryable, ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
+use bcrypt::{hash, DEFAULT_COST};
+use diesel::{
+    prelude::Queryable, BoolExpressionMethods, ExpressionMethods, QueryDsl, QueryResult,
+    RunQueryDsl,
+};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use tracing_subscriber::fmt::format;
 
-use crate::{db::DbPool, schema, users::RegisterUserPayload};
+use crate::{db::DbPool, schema};
 use std::io::ErrorKind;
 
 #[derive(Queryable, Serialize, Clone, Deserialize)]
 pub(super) struct ApiKey {
     pub id: uuid::Uuid,
     user_id: uuid::Uuid,
-    created_at: chrono::NaiveDateTime,
-    updated_at: chrono::NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
     api_key: String,
 }
 
@@ -46,6 +48,30 @@ impl ApiKey {
         );
         diesel::insert_into(schema::api_keys::table)
             .values(values)
+            .get_result(conn)
+    }
+
+    pub(super) fn find_many(pool: &DbPool, user_id: &uuid::Uuid) -> QueryResult<Vec<ApiKey>> {
+        let conn = &mut pool.get().expect("Couldn't get db connection from pool");
+        schema::api_keys::table
+            .filter(schema::api_keys::user_id.eq(user_id))
+            .order_by(schema::api_keys::created_at.desc())
+            .get_results(conn)
+    }
+
+    pub(super) fn delete(
+        pool: &DbPool,
+        id: &uuid::Uuid,
+        user_id: &uuid::Uuid,
+    ) -> QueryResult<ApiKey> {
+        let conn = &mut pool.get().expect("Couldn't get db connection from pool");
+
+        diesel::delete(schema::api_keys::table)
+            .filter(
+                schema::api_keys::id
+                    .eq(id)
+                    .and(schema::api_keys::user_id.eq(user_id)),
+            )
             .get_result(conn)
     }
 }
