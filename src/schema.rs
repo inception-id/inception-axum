@@ -2,8 +2,23 @@
 
 pub mod sql_types {
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "whatsapp_environment"))]
+    pub struct WhatsappEnvironment;
+
+    #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "whatsapp_message_type"))]
     pub struct WhatsappMessageType;
+}
+
+diesel::table! {
+    api_keys (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        #[max_length = 255]
+        api_key -> Varchar,
+    }
 }
 
 diesel::table! {
@@ -36,6 +51,23 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use super::sql_types::WhatsappEnvironment;
+
+    whatsapp_notifications (id) {
+        id -> Uuid,
+        session_id -> Uuid,
+        user_id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        #[max_length = 255]
+        target_phone -> Varchar,
+        text_message -> Nullable<Text>,
+        environment -> WhatsappEnvironment,
+    }
+}
+
+diesel::table! {
     whatsapp_sessions (id) {
         id -> Uuid,
         user_id -> Uuid,
@@ -48,11 +80,16 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(api_keys -> users (user_id));
 diesel::joinable!(whatsapp_messages -> whatsapp_sessions (session_id));
+diesel::joinable!(whatsapp_notifications -> users (user_id));
+diesel::joinable!(whatsapp_notifications -> whatsapp_sessions (session_id));
 diesel::joinable!(whatsapp_sessions -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    api_keys,
     users,
     whatsapp_messages,
+    whatsapp_notifications,
     whatsapp_sessions,
 );
