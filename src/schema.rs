@@ -47,6 +47,8 @@ diesel::table! {
         target_phone -> Varchar,
         message_type -> WhatsappMessageType,
         text_message -> Nullable<Text>,
+        #[max_length = 255]
+        country_code -> Varchar,
     }
 }
 
@@ -64,6 +66,8 @@ diesel::table! {
         target_phone -> Varchar,
         text_message -> Nullable<Text>,
         environment -> WhatsappEnvironment,
+        #[max_length = 255]
+        country_code -> Varchar,
     }
 }
 
