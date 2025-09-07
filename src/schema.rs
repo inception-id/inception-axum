@@ -81,6 +81,8 @@ diesel::table! {
         phone -> Varchar,
         is_ready -> Bool,
         is_deleted -> Bool,
+        hourly_limit -> Int4,
+        daily_limit -> Int4,
     }
 }
 
