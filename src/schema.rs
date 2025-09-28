@@ -4,6 +4,10 @@ pub mod sql_types {
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "whatsapp_environment"))]
     pub struct WhatsappEnvironment;
+
+    #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "whatsapp_message_status"))]
+    pub struct WhatsappMessageStatus;
 }
 
 diesel::table! {
@@ -33,6 +37,7 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::WhatsappEnvironment;
+    use super::sql_types::WhatsappMessageStatus;
 
     whatsapp_messages (id) {
         id -> Uuid,
@@ -45,12 +50,14 @@ diesel::table! {
         #[max_length = 255]
         country_code -> Varchar,
         environment -> WhatsappEnvironment,
+        status -> WhatsappMessageStatus,
     }
 }
 
 diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::WhatsappEnvironment;
+    use super::sql_types::WhatsappMessageStatus;
 
     whatsapp_notifications (id) {
         id -> Uuid,
@@ -64,6 +71,7 @@ diesel::table! {
         environment -> WhatsappEnvironment,
         #[max_length = 255]
         country_code -> Varchar,
+        status -> WhatsappMessageStatus,
     }
 }
 
