@@ -8,6 +8,10 @@ pub mod sql_types {
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "whatsapp_message_status"))]
     pub struct WhatsappMessageStatus;
+
+    #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "whatsapp_payment_status"))]
+    pub struct WhatsappPaymentStatus;
 }
 
 diesel::table! {
@@ -78,6 +82,23 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use super::sql_types::WhatsappPaymentStatus;
+
+    whatsapp_payments (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        payment_status -> WhatsappPaymentStatus,
+        amount -> Numeric,
+        items -> Jsonb,
+        doku_request -> Nullable<Jsonb>,
+        doku_response -> Nullable<Jsonb>,
+    }
+}
+
+diesel::table! {
     whatsapp_sessions (id) {
         id -> Uuid,
         user_id -> Uuid,
@@ -96,6 +117,7 @@ diesel::joinable!(api_keys -> users (user_id));
 diesel::joinable!(whatsapp_messages -> whatsapp_sessions (session_id));
 diesel::joinable!(whatsapp_notifications -> users (user_id));
 diesel::joinable!(whatsapp_notifications -> whatsapp_sessions (session_id));
+diesel::joinable!(whatsapp_payments -> users (user_id));
 diesel::joinable!(whatsapp_sessions -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
@@ -103,5 +125,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     users,
     whatsapp_messages,
     whatsapp_notifications,
+    whatsapp_payments,
     whatsapp_sessions,
 );
