@@ -51,6 +51,7 @@ diesel::table! {
         country_code -> Varchar,
         environment -> WhatsappEnvironment,
         status -> WhatsappMessageStatus,
+        media_url -> Nullable<Varchar>,
     }
 }
 
@@ -72,6 +73,7 @@ diesel::table! {
         #[max_length = 255]
         country_code -> Varchar,
         status -> WhatsappMessageStatus,
+        media_url -> Nullable<Varchar>,
     }
 }
 
