@@ -98,7 +98,7 @@ diesel::table! {
         paid_at -> Nullable<Timestamp>,
         year -> Nullable<Int4>,
         month -> Nullable<Int4>,
-        doku_notif -> Jsonb,
+        doku_notif -> Nullable<Jsonb>,
     }
 }
 
