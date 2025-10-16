@@ -95,6 +95,11 @@ diesel::table! {
         items -> Jsonb,
         doku_request -> Nullable<Jsonb>,
         doku_response -> Nullable<Jsonb>,
+        paid_at -> Nullable<Timestamp>,
+        year -> Nullable<Int4>,
+        month -> Nullable<Int4>,
+        doku_notif -> Nullable<Jsonb>,
+        per_unit_price -> Numeric,
     }
 }
 
