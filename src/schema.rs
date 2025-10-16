@@ -99,6 +99,7 @@ diesel::table! {
         year -> Nullable<Int4>,
         month -> Nullable<Int4>,
         doku_notif -> Nullable<Jsonb>,
+        per_unit_price -> Numeric,
     }
 }
 
