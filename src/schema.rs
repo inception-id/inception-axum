@@ -115,7 +115,6 @@ diesel::table! {
         is_deleted -> Bool,
         hourly_limit -> Int4,
         daily_limit -> Int4,
-        is_disconnected -> Bool,
     }
 }
 
