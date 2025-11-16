@@ -20,7 +20,7 @@ COPY --from=builder /app/target/release/inception-axum /app/
 COPY --from=builder /app/migrations /app/migrations
 COPY --from=builder /app/diesel.toml /app/
 
-RUN cargo install diesel_cli --no-default-features --features postgres
+RUN cargo install diesel_cli --no-default-features --features postgres --version 2.2.12
 
 EXPOSE 8000
 ENTRYPOINT /app/inception-axum
