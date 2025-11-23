@@ -6,6 +6,10 @@ pub mod sql_types {
     pub struct WhatsappEnvironment;
 
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "whatsapp_message_direction"))]
+    pub struct WhatsappMessageDirection;
+
+    #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "whatsapp_message_status"))]
     pub struct WhatsappMessageStatus;
 
@@ -42,6 +46,7 @@ diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::WhatsappEnvironment;
     use super::sql_types::WhatsappMessageStatus;
+    use super::sql_types::WhatsappMessageDirection;
 
     whatsapp_messages (id) {
         id -> Uuid,
@@ -56,6 +61,8 @@ diesel::table! {
         environment -> WhatsappEnvironment,
         status -> WhatsappMessageStatus,
         media_url -> Nullable<Varchar>,
+        user_id -> Nullable<Uuid>,
+        direction -> WhatsappMessageDirection,
     }
 }
 
@@ -120,6 +127,7 @@ diesel::table! {
 }
 
 diesel::joinable!(api_keys -> users (user_id));
+diesel::joinable!(whatsapp_messages -> users (user_id));
 diesel::joinable!(whatsapp_messages -> whatsapp_sessions (session_id));
 diesel::joinable!(whatsapp_notifications -> users (user_id));
 diesel::joinable!(whatsapp_notifications -> whatsapp_sessions (session_id));
